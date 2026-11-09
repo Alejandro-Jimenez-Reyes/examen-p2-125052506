@@ -33,6 +33,7 @@ docker compose run --rm hadoop "rm -rf /salida/job_top10 && time hadoop jar \$HA
   -files /mapreduce/mapper.py,/mapreduce/reducer.py \
   -mapper 'python3 mapper.py' -reducer 'python3 reducer.py' \
   -input file:///data/ventas_125052506.csv -output file:///salida/job_top10"
+sudo chown -R $USER:$USER salida/
 sort -t$'\t' -k2 -nr salida/job_top10/part-00000 | head -10 > salida/top10.tsv
 ```
 
