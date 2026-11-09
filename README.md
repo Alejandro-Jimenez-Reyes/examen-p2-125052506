@@ -16,7 +16,7 @@ cp .env.example .env     # editar POSTGRES_PASSWORD
 2. Generar el dataset (no se sube al repo):
 
 ```bash
-python3 data/generar_dataset.py 125052506
+cd data && python3 generar_dataset.py 125052506 && cd ..
 ```
 
 3. Levantar el ambiente:
