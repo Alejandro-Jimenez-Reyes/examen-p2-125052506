@@ -17,9 +17,13 @@ ENV JAVA_HOME=/usr/lib/jvm/java
 ENV HADOOP_HOME=/opt/hadoop
 ENV PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
 
-# Hadoop
-COPY hadoop-${HADOOP_VERSION}.tar.gz /tmp/hadoop.tar.gz
-RUN tar -xzf /tmp/hadoop.tar.gz -C /opt \
+# Hadoop (se descarga en el build; el .tar.gz no va en el repo)
+RUN for url in \
+    https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz \
+    https://dlcdn.apache.org/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz ; do \
+    curl -fL --retry 10 --retry-delay 5 --retry-all-errors -C - -o /tmp/hadoop.tar.gz "$url" && break ; \
+    done \
+    && tar -xzf /tmp/hadoop.tar.gz -C /opt \
     && mv /opt/hadoop-${HADOOP_VERSION} ${HADOOP_HOME} \
     && rm /tmp/hadoop.tar.gz \
     && echo "export JAVA_HOME=${JAVA_HOME}" >> ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh

@@ -1,0 +1,42 @@
+services:
+  hadoop:
+    build: ./hadoop
+    container_name: hadoop
+    env_file: .env
+    volumes:
+      - ./data:/data:ro
+      - ./mapreduce:/mapreduce
+      - ./salida:/salida
+    networks: [datamart]
+
+  db:
+    image: postgres:16
+    container_name: db
+    env_file: .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks: [datamart]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: ./api
+    container_name: api
+    env_file: .env
+    ports:
+      - "${API_PORT}:8000"
+    volumes:
+      - ./scripts:/scripts
+      - ./salida:/salida
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [datamart]
+
+networks:
+  datamart:
+
+volumes:
+  pgdata:
